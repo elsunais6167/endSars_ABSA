@@ -1,75 +1,48 @@
-{% extends 'base/base.html' %}
+{% extends 'base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
-<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-    <!-- Navbar -->
-    <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur"
-        navbar-scroll="true">
-        <div class="container-fluid py-1 px-3">
 
-               
-            <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-                <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                    <div class="input-group">
-                        <span class="input-group-text text-body"><i class="fas fa-search"
-                                aria-hidden="true"></i></span>
-                        <input type="text" class="form-control" placeholder="Type here...">
-                    </div>
-                </div>
-                <ul class="navbar-nav  justify-content-end">
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="btn btn-outline-primary btn-sm mb-0 me-3"  href="{% url 'home' %}">Home</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <!-- End Navbar -->
-<div class="container">
-    <div class="row">
-        <div class="col-xl-8 col-lg-5 col-md-6 d-flex flex-column mx-auto">
-            <div class="card card-plain mt-8">
-                {% if messages %}
-
-                {% for message in messages %}
-                <div class="alert alert-success" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor %}
-
-                {% endif %}
-                <div class="card-header pb-0 text-left bg-transparent">
-                    <h3 class="font-weight-bolder text-info text-gradient" style="text-align: center;">Login</h3>
-
-                </div>
-                <div class="card-body">
-                    <form role="form" method="post" action="{% url 'login' %}">
-                        {% csrf_token %}
-                        <label>Email</label>
-                        <div class="mb-3">
-                            <input type="email" name="username" class="form-control" placeholder="Email" required>
-                        </div>
-                        <label>Password</label>
-                        <div class="mb-3">
-                            <input type="password" name="password" class="form-control" placeholder="Password" required>
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn bg-gradient-info w-100 mt-4 mb-0">Sign in</button>
-                        </div>
-                    </form>
-                    {% if error_message %}
-                    <div class="text-center text-danger">{{ error_message }}</div>
-                    {% endif %}
-                    {% if login_error %}
-                    <div class="text-center text-danger">{{ login_error }}</div>
-                    {% endif %}
-                </div>
-                
-            </div>
-        </div>
-
+<!-- Content wrapper -->
+<div class="content-wrapper d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+  <!-- Content -->
+  <div class="card mb-4" style="width: 100%; max-width: 500px;">
+    <h5 class="card-header text-center">Login</h5>
+    <div id="alert-div" class="alert alert-danger alert-dismissible" role="alert" {% if login_error or error_message %} style="display: block;" {% else %} style="display: none;" {% endif %}>
+        {% if login_error %}
+            {{ login_error }}
+        {% else %}
+            {{ error_message }}
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    <!-- Account -->
+    <form method="POST" action="">
+      {% csrf_token %}
+      <hr class="my-0" />
+      <div class="card-body"> 
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Username</label>
+            <input type="text" class="form-control" name="username"
+                aria-describedby="emailHelp">
+            <div id="username" class="form-text"> </div>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" name="password">
+        </div>
+
+        <div class="mt-2 text-center">
+          <button type="submit" class="btn btn-primary me-2">Login</button>
+        </div>
+        <br>
+        <hr class="my-0" />
+        <br>
+         <h4 style="text-align: center;"> <a href="{% url 'register' %}"> Click here to Sign-Up</h4> </a> 
+      </div>
+    </form>
+  </div>
 </div>
-</main>
 {% endblock content %}
+
+

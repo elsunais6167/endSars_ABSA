@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<!-- Content wrapper -->
+<div class="content-wrapper d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+  <!-- Content -->
+  <div class="card mb-4" style="width: 100%; max-width: 500px;">
+    <h5 class="card-header text-center">Sign-Up</h5>
+    {% if form.errors %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      There was an error in your form. Please try again and be careful this time.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    <!-- Account -->
+    <form method="POST" action="">
+      {% csrf_token %}
+      <hr class="my-0" />
+      <div class="card-body"> 
+        {{ form}}
+
+        <div class="mt-2 text-center">
+          <button type="submit" class="btn btn-primary me-2">Register</button>
+        </div>
+        <br>
+        <hr class="my-0" />
+        <br>
+         <h4 style="text-align: center;"> <a href="{% url 'login' %}"> Click here for Login</h4> </a> 
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}
