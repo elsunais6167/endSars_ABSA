@@ -2,47 +2,80 @@
 {% load widget_tweaks %}
 
 {% block content %}
-
-<!-- Content wrapper -->
 <div class="content-wrapper d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-  <!-- Content -->
-  <div class="card mb-4" style="width: 100%; max-width: 500px;">
-    <h5 class="card-header text-center">Login</h5>
-    <div id="alert-div" class="alert alert-danger alert-dismissible" role="alert" {% if login_error or error_message %} style="display: block;" {% else %} style="display: none;" {% endif %}>
-        {% if login_error %}
-            {{ login_error }}
-        {% else %}
-            {{ error_message }}
-        {% endif %}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <!-- Account -->
-    <form method="POST" action="">
-      {% csrf_token %}
-      <hr class="my-0" />
-      <div class="card-body"> 
-        <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Username</label>
-            <input type="text" class="form-control" name="username"
-                aria-describedby="emailHelp">
-            <div id="username" class="form-text"> </div>
+  <!-- Content wrapper -->
+  <div class="content-wrapper">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <div class="row">
+        <div class="card">
+          <div class="card-body">
+            <div class="col-lg-12 mb-3 order-0">
+              <h2 class="card-title text-primary text-center">Welcome to Incidence Reporting System</h2>
+            </div>
+            <nav class="navbar navbar-expand-md pb-4">
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon">Open</span>
+              </button>
+              <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="nav nav-pills flex-column flex-md-row">
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}"><i class="bx bx-home-smile"></i>
+                      Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'report-list' %}"><i class="bx bx-list-ul"></i>
+                      Incidence Reports</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'knowledge-hub' %}"><i class='bx bxs-graduation'></i>Knowledge Hub</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" href="javascript:void(0);"><i class="bx bx-log-in-circle"></i>Login</a>
+                  </li>
+                </ul>
+              </div>
+            </nav>
+          </div>
         </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" name="password">
-        </div>
-
-        <div class="mt-2 text-center">
-          <button type="submit" class="btn btn-primary me-2">Login</button>
-        </div>
-        <br>
-        <hr class="my-0" />
-        <br>
-         <h4 style="text-align: center;"> <a href="{% url 'register' %}"> Click here to Sign-Up</h4> </a> 
       </div>
-    </form>
+      <br>
+      <!-- Login Form -->
+      <div class="card" style="width: 100%; max-width: 500px; padding-top: 20px; margin: 0 auto;">
+        <h5 class="card-header text-center">Login</h5>
+        <div id="alert-div" class="alert alert-danger alert-dismissible" role="alert" {% if login_error or error_message %} style="display: block;" {% else %} style="display: none;" {% endif %}>
+          {% if login_error %}
+              {{ login_error }}
+          {% else %}
+              {{ error_message }}
+          {% endif %}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <!-- Account -->
+        <form method="POST" action="">
+          {% csrf_token %}
+          <hr class="my-0" />
+          <div class="card-body"> 
+            <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">Username</label>
+              <input type="text" class="form-control" name="username" aria-describedby="emailHelp">
+              <div id="username" class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" name="password">
+            </div>
+            <div class="mt-2 text-center">
+              <button type="submit" class="btn btn-primary me-2">Login</button>
+            </div>
+            <br>
+            <hr class="my-0" />
+            <br>
+            <h4 class="text-center"><a href="{% url 'register' %}">Click here to Sign-Up</a></h4>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock content %}
-
-
