@@ -51,22 +51,18 @@
             Dashboard</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#"><i class="bx bx-list-ul"></i>
-            List of Stations</a>
+          <a class="nav-link" href="{% url 'admin-users' %}"><i class='bx bxs-user-detail'></i>Users</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#"><i class='bx bx-add-to-queue'></i> Add a New User</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="bx bxs-building-house"></i> Add a New Station
+          <a class="nav-link" href="{% url 'admin-reports' %}"><i class="bx bxs-report"></i>Reports
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#"><i class="bx bx-list-ul"></i>
-            List of Users</a>
+          <a class="nav-link" href="{% url 'admin-hub' %}"><i class="bx bxs-graduation"></i>
+            Knowledge</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#"><i class="bx bx-home-smile"></i> Campaigns
+          <a class="nav-link" href="{% url 'logout' %}"><i class="bx bx-log-out"></i>Logut
           </a>
         </li>
       </ul>

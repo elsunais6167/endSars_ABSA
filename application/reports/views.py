@@ -9,10 +9,40 @@ from django.contrib.auth import logout as auth_logout
 
 from django.contrib import messages
 
-from .forms import RegisterForm
 
+import joblib
+import logging
+
+#forms
+from .forms import RegisterForm
+from .forms import AdminForm
+from .forms import IncidenceForm
+
+#database models
+from .models import CustomUser
+from .models import Incidence
+from .models import KnowledgeCategory
+from .models import KnowledgeComment
+from .models import ExpertKnowledge
+
+
+# Load the saved CountVectorizer
+cVec = joblib.load('count_vectorizer.joblib')
+
+# Load the saved TfidfVectorizer
+tVec = joblib.load('tfidf_vectorizer.joblib')
 # Create your views here.
 
+# Set up logging
+logger = logging.getLogger(__name__)
+
+def load_model(path):
+    try:
+        return joblib.load(path)
+    except Exception as e:
+        logger.error(f"Failed to load model {path}: {str(e)}")
+        return None
+    
 def index(request):
     '''
     stations_map = Station.objects.all()
@@ -204,8 +234,8 @@ def signin(request):
             try:
                 user_role = user.role 
                 if user_role == 'Admin':
-                    return redirect('admin-dash')
-                elif user_role == 'COP Desk Officer':
+                    return redirect('admin-dashboard')
+                elif user_role == 'Reporter':
                     return redirect('admin-cop')
                 else:
                     context['error_message'] = 'Contact the administrator for a designated role.'
@@ -297,3 +327,114 @@ def admin_dasboard(request):
     }
     
     return render(request, 'admin-dash.html', context)
+
+def admin_reports(request):
+    reports = Incidence.objects.all()
+    total_reports = Incidence.objects.count()
+    user = request.user
+
+    form = IncidenceForm()
+    if request.method == "POST":
+        form = IncidenceForm(request.POST)
+        if form.is_valid():
+            incidence = form.save(commit=False)
+            incidence.user = user
+            content = form.cleaned_data['content']
+
+            
+
+            # Apply vectorizers to the content
+            cVec_content = cVec.transform([content])  # Use list to transform a single document
+            tVec_content = tVec.transform([content])
+
+            # Paths to the models
+            model_paths = {
+                'Decision Tree with Count Vectorizer': 'D3CV.joblib',
+                'Decision Tree with TFIDF': 'D3TFIDF.joblib',
+                'Random Forest with Count Vectorizer': 'RFCV.joblib',
+                'Random Forest with TFIDF': 'RFTFIDF.joblib',
+                'Logistic Regression with Count Vectorizer': 'LRCV.joblib',
+                'Logistic Regression with TFIDF': 'LRTFIDF.joblib',
+                'Naive Bayes with Count Vectorizer': 'NBCV.joblib',
+                'Naive Bayes with TFIDF': 'NBTFIDF.joblib',
+                'Support Vector Machine with Count Vectorizer': 'SVMCV.joblib',
+                'Support Vector Machine with TFIDF': 'SVMTFIDF.joblib',
+            }
+
+            predictions = {}
+            prediction_scores = {}
+
+            for model_name, model_path in model_paths.items():
+                model = load_model(model_path)
+                if model:
+                    try:
+                        if 'Count Vectorizer' in model_name:
+                            transformed_content = cVec_content
+                        else:
+                            transformed_content = tVec_content
+
+                        predictions[model_name] = model.predict(transformed_content)[0]
+                        prediction_scores[model_name] = max(model.predict_proba(transformed_content)[0])
+                    except AttributeError as e:
+                        logger.error(f"Error with model {model_name}: {str(e)}")
+                    except Exception as e:
+                        logger.error(f"General error with model {model_name}: {str(e)}")
+
+            # Find the best model and its corresponding score
+            if prediction_scores:
+                best_model = max(prediction_scores, key=prediction_scores.get)
+                best_score = prediction_scores[best_model]
+                best_sentiment = predictions[best_model]
+
+                # Save to the Incidence instance
+                incidence.model = best_model
+                incidence.percentage = f"{best_score * 100:.2f}%"  # Convert to percentage
+                incidence.status = best_sentiment
+
+                # Save the incidence record
+                incidence.save()
+
+            return redirect('admin-reports')
+
+    else:
+        form = IncidenceForm()
+
+    context = {
+        'form': form,
+    }
+    
+    return render(request, 'admin-reports.html', context)
+
+def admin_hub(request):
+    
+    context = {
+        
+    }
+    
+    return render(request, 'admin-dash.html', context)
+
+def admin_users(request):
+    user_list = CustomUser.objects.all()
+    total_users = CustomUser.objects.count()
+    total_reporters = CustomUser.objects.filter(role = 'Reporter').count()
+    total_admins = CustomUser.objects.filter(role = 'Admin').count()
+
+    form = AdminForm()
+    if request.method == "POST":
+        form = AdminForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin-users')
+    
+    else:
+        form = AdminForm()
+
+    context = {
+        'user_list': user_list,
+        'total_users': total_users,
+        'total_reporters': total_reporters,
+        'total_admins': total_admins,
+        'form': form,
+    }
+    
+    return render(request, 'admin-users.html', context)

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="content-wrapper">
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="fw-semibold py-3 mb-4"><span class="text-muted fw-light">Welcome To /</span>Dashboard</h4>
+        <div class="col-lg-12 col-md-12">
+            <div class="row">
+                <!-- First 4-col div -->
+                <div class="col-lg-4 col-md-3 col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <span class="fw-semibold d-block mb-1">Total Users</span>
+                            <h3 class="card-title mb-2">{{total_users}}</h3>
+                            <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-3 col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <span class="fw-semibold d-block mb-1">Total Reporters</span>
+                            <h3 class="card-title mb-2">{{total_reporters}}</h3>
+                            <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-4 col-md-3 col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <span class="fw-semibold d-block mb-1">Total Admins</span>
+                            <h3 class="card-title mb-2">{{total_admins}}</h3>
+                            <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-pills flex-column flex-md-row mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin-dashboard' %}"><i class="bx bxl-telegram me-1"></i>
+                            Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="javascript:void(0);"><i
+                                class='bx bxs-user-detail'></i>Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin-reports' %}"><i class="bx bxs-report"></i>Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin-hub' %}"><i class="bx bxs-graduation"></i>
+                            Knowledge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}"><i class="bx bx-log-out"></i>Logut
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-lg-12 mb-4 order-0">
+                <div class="card">
+                    <div class="d-flex align-items-end row">
+                        <div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h5 class="card-title text-primary">Users</h5>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#user">
+                                        Create User
+                                    </button>
+                                </div>
+                                <div class="table-responsive text-nowrap">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>E-mail</th>
+                                                <th>Role</th>
+                                                <th>Date Joined</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-border-bottom-0">
+                                            {% for u in user_list %}
+                                            <tr>
+                                                <td><i class="fab fa-angular fa-lg text-danger me-3"></i>
+                                                    <strong>{{u.name}}</strong>
+                                                </td>
+                                                <td>
+                                                    {{u.email}}
+                                                </td>
+                                                <td>
+                                                    {{u.role}}
+                                                </td>
+                                                <td>
+                                                    {{u.date_joined}}
+                                                </td>
+
+                                                {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="user" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Add a New User
+                </h1>
+                <button type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{form.as_p}}
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary me-2">Save</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

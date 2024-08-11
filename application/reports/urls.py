@@ -13,5 +13,8 @@ urlpatterns = [
     path('report-list', views.reports_list, name='report-list'),
 
     #Admin
-    path('admin-dashboard', views.admin_dasboard, name='admin-dashboard')
+    path('admin-dashboard', views.admin_dasboard, name='admin-dashboard'),
+    path('admin-reports', views.admin_reports, name='admin-reports'),
+    path('admin-hub', views.admin_hub, name='admin-hub'),
+    path('admin-users', views.admin_users, name='admin-users'),
 ]

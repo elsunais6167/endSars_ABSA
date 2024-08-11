@@ -68,6 +68,7 @@ TEMPLATES = [
         },
     },
 ]
+AUTH_USER_MODEL = 'reports.CustomUser'
 
 WSGI_APPLICATION = 'application.wsgi.application'
 

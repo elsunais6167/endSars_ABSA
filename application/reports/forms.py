@@ -54,3 +54,20 @@ class AdminForm(UserCreationForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
+
+class IncidenceForm(ModelForm):
+    class Meta:
+        model = Incidence
+        fields = ['title', 'social_media', 'content']
+        widgets = {
+            'social_media': forms.Select(attrs={'class': 'form-control'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control'}),
+            'gis_location': forms.HiddenInput(),
+        }
+
+        labels = {
+            'title': 'What Topic is the Post About?',
+            'social_media': 'Which Social Media Handle, do you See this Post?',
+            'content': 'Type the Content of the Post Here!'
+        }
