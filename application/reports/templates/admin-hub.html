@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="fw-semibold py-3 mb-4"><span class="text-muted fw-light">Welcome To /</span>Knowledge Hub</h4>
+        <div class="col-lg-12 col-md-12">
+            <div class="row">
+                <!-- First 4-col div -->
+                <div class="col-lg-6 col-md-3 col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <span class="fw-semibold d-block mb-1">Total Contents</span>
+                            <h3 class="card-title mb-2">{{total_content}}</h3>
+                            <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-3 col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <span class="fw-semibold d-block mb-1">My Content</span>
+                            <h3 class="card-title mb-2">{{my_content}}</h3>
+                            <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-pills flex-column flex-md-row mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin-dashboard' %}"><i class="bx bxl-telegram me-1"></i>
+                            Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin-users' %}"><i class='bx bxs-user-detail'></i>Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin-reports' %}"><i class="bx bxs-report"></i>Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="javascript:void(0);"><i class="bx bxs-graduation"></i>
+                            Knowledge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}"><i class="bx bx-log-out"></i>Logut
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-lg-12 mb-4 order-0">
+                <div class="card">
+                    <div class="d-flex align-items-end row">
+                        <div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <h3 class="card-title text-primary">Knowledge Content</h3>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#submit_category_form" name="submit_category_form">
+                                        Create Knowledge Category
+                                    </button>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#submit_expert_form">
+                                        Make a new Post
+                                    </button>
+                                </div>
+                                <div class="table-responsive text-nowrap">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th style="max-width: 700px;">Contents</th>
+                                                <th>Category</th>
+                                                <th>Expert Details</th>
+                                                <th>Date Created</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-border-bottom-0">
+                                            {% for c in content %}
+                                            <tr>
+                                                <td style="max-width: 300px; word-wrap: break-word; white-space: normal;">
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center">
+                                                            <h6 class="mb-0 text-sm">{{ c.title }}</h6>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                                                                              
+                                                <td>
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center">
+                                                            <p class="text-xs text-secondary mb-0">
+                                                                {% for category in c.categories.all %}
+                                                                    {{ category.name }}{% if not forloop.last %}, {% endif %}
+                                                                {% endfor %}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                
+                                                <td>
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center">
+                                                            <h6 class="mb-0 text-sm">{{ c.expert.name }}</h6>
+                                                            <p class="text-xs text-secondary mb-0">{{ c.expert.email }}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                
+                                                <td>
+                                                    <div class="d-flex px-2 py-1">
+                                                        <div class="d-flex flex-column justify-content-center">
+                                                            <p class="text-xs text-secondary mb-0">{{ c.created_at }}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'content' c.id %}" class="btn btn-primary me-2">View Post</a>
+                                                  </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>                                
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="submit_expert_form" name="submit_expert_form" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Post Knowledge Content
+                </h1>
+                <button type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{form.as_p}}
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary me-2" name="submit_expert_form">Save</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="submit_category_form" name="submit_category_form" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Create Category
+                </h1>
+                <button type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{form2.as_p}}
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary me-2" name="submit_category_form">Save</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

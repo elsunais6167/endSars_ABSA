@@ -1,4 +1,4 @@
-from . import views
+from  . import views
 from django.urls import path
 
 urlpatterns = [
@@ -17,4 +17,7 @@ urlpatterns = [
     path('admin-reports', views.admin_reports, name='admin-reports'),
     path('admin-hub', views.admin_hub, name='admin-hub'),
     path('admin-users', views.admin_users, name='admin-users'),
+
+    #generic
+    path('content/<str:pk>/', views.content, name='content')
 ]

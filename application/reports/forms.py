@@ -58,7 +58,7 @@ class AdminForm(UserCreationForm):
 class IncidenceForm(ModelForm):
     class Meta:
         model = Incidence
-        fields = ['title', 'social_media', 'content']
+        fields = ['title', 'social_media', 'content', 'gis_location']
         widgets = {
             'social_media': forms.Select(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),
@@ -71,3 +71,37 @@ class IncidenceForm(ModelForm):
             'social_media': 'Which Social Media Handle, do you See this Post?',
             'content': 'Type the Content of the Post Here!'
         }
+
+class CategoryForm(ModelForm):
+    class Meta:
+        model = KnowledgeCategory
+        fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+        labels = {
+            'name': 'Category Name',
+            'description': 'Use one sentence to describe category',
+        }
+
+class ExpertForm(ModelForm):
+    class Meta:
+        model = ExpertKnowledge
+        fields = ['title', 'content', 'categories']
+        widgets = {
+            'categories': forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = KnowledgeComment
+        fields = ['comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+        

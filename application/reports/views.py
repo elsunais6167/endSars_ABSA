@@ -8,7 +8,7 @@ from django.contrib.auth import login
 from django.contrib.auth import logout as auth_logout
 
 from django.contrib import messages
-
+from collections import Counter
 
 import joblib
 import logging
@@ -17,6 +17,9 @@ import logging
 from .forms import RegisterForm
 from .forms import AdminForm
 from .forms import IncidenceForm
+from .forms import ExpertForm
+from .forms import CommentForm
+from .forms import CategoryForm
 
 #database models
 from .models import CustomUser
@@ -103,60 +106,19 @@ def index(request):
     return render(request, 'index.html', context)
 
 def hub(request):
-    '''
-    stations_map = Station.objects.all()
-    markers = []
-
-    for station in stations_map:
-        patients_count = Diagnosis.objects.filter(patient_id__care_centre=station).count()
-        positive_cases = Diagnosis.objects.filter(patient_id__care_centre=station, results='Positive').count()
-
-        lat, lon = map(float, station.gis_location.split(','))
-        station_url = f"/sta-public/{station.id}/"
-        popup_content = f"""
-        <a href="{station_url}"> <strong>{station.name}</strong> </a>  <br>
-        Total Malaria Test: {patients_count} <br>
-        Positive Cases: {positive_cases} <br>
-        """  
-        markers.append({
-            'location': [lat, lon],
-            'popup': popup_content
-        })
-
+    category = request.GET.get('category')
     
-    campaign_map = Campaign.objects.all()
     
-    markers2 = []
-    for campaign in campaign_map:
-        s1 = CampReport.objects.filter(campaign_id=campaign).aggregate(total_screened_female=Sum('screened_female'))['total_screened_female']
-        t1 = CampReport.objects.filter(campaign_id=campaign).aggregate(total_treated_female=Sum('treated_female'))['total_treated_female']
-        r1= CampReport.objects.filter(campaign_id=campaign).aggregate(total_referral_female=Sum('referral_female'))['total_referral_female']
-
-        s2 = CampReport.objects.filter(campaign_id=campaign).aggregate(total_screened_male=Sum('screened_male'))['total_screened_male']
-        t2 = CampReport.objects.filter(campaign_id=campaign).aggregate(total_treated_male=Sum('treated_male'))['total_treated_male']
-        r2 = CampReport.objects.filter(campaign_id=campaign).aggregate(total_referral_male=Sum('referral_male'))['total_referral_male']
-        
-        screened_count = s1 + s2
-        treated_cases = t1 + t2
-        refer_cases = r1 + r2
-        
-        lat, lon = map(float, campaign.gis_location.split(','))
-
-        campaign_url = f"/camp-public/{campaign.id}/"
-        popup_content = f"""
-        <a href="{campaign_url}"> <strong>{campaign.name}</strong> </a>  <br>
-        Total Screened: {screened_count} <br>
-        Total Treated: {treated_cases} <br>
-        Total Referral: {refer_cases} <br>
-        """  
-        markers2.append({
-            'location': [lat, lon],
-            'popup': popup_content
-        })
-        '''
+    if category:
+        content = ExpertKnowledge.objects.filter(categories__name=category)
+    else:
+        content = ExpertKnowledge.objects.all()
+    
+    
+    categories = KnowledgeCategory.objects.all()
     context = {
-        #'markers_json': json.dumps(markers),
-        #'markers_json2': json.dumps(markers2),
+        'content': content,
+        'categories': categories,
     }
     
     return render(request, 'hub.html', context)
@@ -328,10 +290,12 @@ def admin_dasboard(request):
     
     return render(request, 'admin-dash.html', context)
 
+
 def admin_reports(request):
     reports = Incidence.objects.all()
     total_reports = Incidence.objects.count()
     user = request.user
+    user_reports = Incidence.objects.filter(user_id=user).count()
 
     form = IncidenceForm()
     if request.method == "POST":
@@ -341,13 +305,11 @@ def admin_reports(request):
             incidence.user = user
             content = form.cleaned_data['content']
 
-            
-
             # Apply vectorizers to the content
-            cVec_content = cVec.transform([content])  # Use list to transform a single document
+            cVec_content = cVec.transform([content])
             tVec_content = tVec.transform([content])
 
-            # Paths to the models
+            # Load models
             model_paths = {
                 'Decision Tree with Count Vectorizer': 'D3CV.joblib',
                 'Decision Tree with TFIDF': 'D3TFIDF.joblib',
@@ -357,11 +319,10 @@ def admin_reports(request):
                 'Logistic Regression with TFIDF': 'LRTFIDF.joblib',
                 'Naive Bayes with Count Vectorizer': 'NBCV.joblib',
                 'Naive Bayes with TFIDF': 'NBTFIDF.joblib',
-                'Support Vector Machine with Count Vectorizer': 'SVMCV.joblib',
-                'Support Vector Machine with TFIDF': 'SVMTFIDF.joblib',
             }
 
-            predictions = {}
+            predictions = []
+            model_predictions = {}
             prediction_scores = {}
 
             for model_name, model_path in model_paths.items():
@@ -373,26 +334,41 @@ def admin_reports(request):
                         else:
                             transformed_content = tVec_content
 
-                        predictions[model_name] = model.predict(transformed_content)[0]
-                        prediction_scores[model_name] = max(model.predict_proba(transformed_content)[0])
+                        predicted_sentiment = model.predict(transformed_content)[0]
+                        predicted_score = max(model.predict_proba(transformed_content)[0])
+
+                        predictions.append(predicted_sentiment)
+                        model_predictions[model_name] = predicted_sentiment
+                        prediction_scores[model_name] = predicted_score
                     except AttributeError as e:
                         logger.error(f"Error with model {model_name}: {str(e)}")
                     except Exception as e:
                         logger.error(f"General error with model {model_name}: {str(e)}")
 
-            # Find the best model and its corresponding score
-            if prediction_scores:
-                best_model = max(prediction_scores, key=prediction_scores.get)
-                best_score = prediction_scores[best_model]
-                best_sentiment = predictions[best_model]
+            # Apply voting mechanism
+            if predictions:
+                # Find the most common prediction
+                most_common_sentiment, _ = Counter(predictions).most_common(1)[0]
 
-                # Save to the Incidence instance
-                incidence.model = best_model
-                incidence.percentage = f"{best_score * 100:.2f}%"  # Convert to percentage
-                incidence.status = best_sentiment
+                # Filter models that made the most common prediction and calculate the average score
+                total_score = 0
+                count = 0
+                for model_name, sentiment in model_predictions.items():
+                    if sentiment == most_common_sentiment:
+                        total_score += prediction_scores[model_name]
+                        count += 1
 
-                # Save the incidence record
-                incidence.save()
+                # Calculate the average score
+                if count > 0:
+                    average_score = total_score / count
+
+                    # Save the results to the Incidence instance
+                    incidence.model = 'Ensemble Model'
+                    incidence.percentage = f"{average_score * 100:.2f}%"
+                    incidence.status = most_common_sentiment
+
+                    # Save the incidence record
+                    incidence.save()
 
             return redirect('admin-reports')
 
@@ -401,17 +377,49 @@ def admin_reports(request):
 
     context = {
         'form': form,
+        'reports': reports,
+        'total_reports': total_reports,
+        'user_reports': user_reports,
     }
-    
+
     return render(request, 'admin-reports.html', context)
 
+
+
 def admin_hub(request):
-    
+    user = request.user
+    content = ExpertKnowledge.objects.all()
+    total_content = ExpertKnowledge.objects.count()
+    my_content = ExpertKnowledge.objects.filter(expert=user).count()
+
+    form = ExpertForm()
+    form2 = CategoryForm()
+
+    if request.method == "POST":
+        if 'submit_expert_form' in request.POST:
+            form = ExpertForm(request.POST)
+            if form.is_valid():
+                expert_knowledge = form.save(commit=False)
+                expert_knowledge.expert = user
+                expert_knowledge.save()
+                form.save_m2m() 
+                return redirect('admin-hub')
+
+        elif 'submit_category_form' in request.POST:
+            form2 = CategoryForm(request.POST)
+            if form2.is_valid():
+                form2.save()
+                return redirect('admin-hub')
+
     context = {
-        
+        'form': form,
+        'form2': form2,
+        'content': content,
+        'total_content': total_content,
+        'my_content': my_content,
     }
     
-    return render(request, 'admin-dash.html', context)
+    return render(request, 'admin-hub.html', context)
 
 def admin_users(request):
     user_list = CustomUser.objects.all()
@@ -438,3 +446,25 @@ def admin_users(request):
     }
     
     return render(request, 'admin-users.html', context)
+
+def content(request, pk):
+    post = get_object_or_404(ExpertKnowledge, pk=pk)
+    form = ExpertForm()
+    if request.method == "POST":
+        form = ExpertForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('admin-hub')
+    
+    else:
+        form = ExpertForm(instance=post)
+
+    is_creator = request.user == post.expert
+
+    context = {
+        'form': form,
+        'post': post,
+        'is_creator': is_creator,
+    }
+    
+    return render(request, 'content.html', context)
