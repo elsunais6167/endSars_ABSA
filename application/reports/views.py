@@ -6,6 +6,8 @@ from django.core.paginator import Paginator
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth import logout as auth_logout
+from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
 
 from django.contrib import messages
 from collections import Counter
@@ -116,7 +118,7 @@ def signin(request):
                 if user_role == 'Admin':
                     return redirect('admin-dashboard')
                 elif user_role == 'Reporter':
-                    return redirect('admin-cop')
+                    return redirect('reporter-dashboard')
                 else:
                     context['error_message'] = 'Contact the administrator for a designated role.'
             except: 
@@ -361,3 +363,169 @@ def content(request, pk):
     }
     
     return render(request, 'content.html', context)
+
+def reporter_dasboard(request):
+    reports = Incidence.objects.all()
+    paginator = Paginator(reports, 4)
+    total_report = Incidence.objects.count()
+    total_reporters = CustomUser.objects.filter(role='Reporter').count()
+    total_content = ExpertKnowledge.objects.count()
+    total_postive = Incidence.objects.filter(status='1').count()
+    total_negative = Incidence.objects.filter(status='0').count()
+    total_fc = Incidence.objects.filter(social_media = 'Facebook').count()
+    total_tw = Incidence.objects.filter(social_media = 'Twitter').count()
+    total_in = Incidence.objects.filter(social_media = 'Instagram').count()
+    total_ln = Incidence.objects.filter(social_media = 'LinkedIn').count()
+    total_ot = Incidence.objects.filter(social_media = 'Others').count()
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'reports': reports,
+        'total_report': total_report,
+        'total_content': total_content,
+        'total_positive': total_postive,
+        'total_negative': total_negative,
+        'total_reporters': total_reporters,
+        'total_fc': total_fc,
+        'total_tw': total_tw,
+        'total_in': total_in,
+        'total_ln': total_ln,
+        'total_ot': total_ot,
+        'page_obj': page_obj,
+    }
+    
+    return render(request, 'reporter-dash.html', context)
+
+
+def reporter_reports(request):
+    user = request.user
+    reports = Incidence.objects.filter(user_id=user)
+    total_reports = Incidence.objects.count()
+    user_reports = Incidence.objects.filter(user_id=user).count()
+
+    form = IncidenceForm()
+    if request.method == "POST":
+        form = IncidenceForm(request.POST)
+        if form.is_valid():
+            incidence = form.save(commit=False)
+            incidence.user = user
+            content = form.cleaned_data['content']
+
+            # Apply vectorizers to the content
+            cVec_content = cVec.transform([content])
+            tVec_content = tVec.transform([content])
+
+            # Load models
+            model_paths = {
+                'Decision Tree with Count Vectorizer': 'D3CV.joblib',
+                'Decision Tree with TFIDF': 'D3TFIDF.joblib',
+                'Random Forest with Count Vectorizer': 'RFCV.joblib',
+                'Random Forest with TFIDF': 'RFTFIDF.joblib',
+                'Logistic Regression with Count Vectorizer': 'LRCV.joblib',
+                'Logistic Regression with TFIDF': 'LRTFIDF.joblib',
+                'Naive Bayes with Count Vectorizer': 'NBCV.joblib',
+                'Naive Bayes with TFIDF': 'NBTFIDF.joblib',
+            }
+
+            predictions = []
+            model_predictions = {}
+            prediction_scores = {}
+
+            for model_name, model_path in model_paths.items():
+                model = load_model(model_path)
+                if model:
+                    try:
+                        if 'Count Vectorizer' in model_name:
+                            transformed_content = cVec_content
+                        else:
+                            transformed_content = tVec_content
+
+                        predicted_sentiment = model.predict(transformed_content)[0]
+                        predicted_score = max(model.predict_proba(transformed_content)[0])
+
+                        predictions.append(predicted_sentiment)
+                        model_predictions[model_name] = predicted_sentiment
+                        prediction_scores[model_name] = predicted_score
+                    except AttributeError as e:
+                        logger.error(f"Error with model {model_name}: {str(e)}")
+                    except Exception as e:
+                        logger.error(f"General error with model {model_name}: {str(e)}")
+
+            # Apply voting mechanism
+            if predictions:
+                # Find the most common prediction
+                most_common_sentiment, _ = Counter(predictions).most_common(1)[0]
+
+                # Filter models that made the most common prediction and calculate the average score
+                total_score = 0
+                count = 0
+                for model_name, sentiment in model_predictions.items():
+                    if sentiment == most_common_sentiment:
+                        total_score += prediction_scores[model_name]
+                        count += 1
+
+                # Calculate the average score
+                if count > 0:
+                    average_score = total_score / count
+
+                    # Save the results to the Incidence instance
+                    incidence.model = 'Ensemble Model'
+                    incidence.percentage = f"{average_score * 100:.2f}%"
+                    incidence.status = most_common_sentiment
+
+                    # Save the incidence record
+                    incidence.save()
+
+                    # Check if incidence status is "0"
+                    if incidence.status == 0:
+                        User = get_user_model()
+                        admins = User.objects.filter(role='Admin')
+                        subject = 'New Negative Incident Reported'
+                        message = f"An incident with a Negative status has been reported.\nDetails:\nPost Title: {incidence.title}\nPost Content: {incidence.content}\nPredicted by: {incidence.model}\nwith Percentage of: {incidence.percentage}"
+                        from_email = 'rugu@mhinnov8.com.ng'
+
+                        # Send email to all admins
+                        recipient_list = [admin.email for admin in admins]
+                        send_mail(subject, message, from_email, recipient_list)
+
+            return redirect('reporter-reports')
+
+    else:
+        form = IncidenceForm()
+
+    context = {
+        'form': form,
+        'reports': reports,
+        'total_reports': total_reports,
+        'user_reports': user_reports,
+    }
+
+    return render(request, 'reporter-reports.html', context)
+
+
+
+def reporter_hub(request):
+    user = request.user
+    content = ExpertKnowledge.objects.filter(expert=user)
+    total_content = ExpertKnowledge.objects.count()
+    my_content = ExpertKnowledge.objects.filter(expert=user).count()
+
+    form = ExpertForm()
+    if request.method == "POST":
+        form = ExpertForm(request.POST)
+        if form.is_valid():
+            expert_knowledge = form.save(commit=False)
+            expert_knowledge.expert = user
+            expert_knowledge.save()
+            form.save_m2m() 
+            return redirect('reporter-hub')  
+    context = {
+        'form': form,
+        'content': content,
+        'total_content': total_content,
+        'my_content': my_content,
+    }
+    
+    return render(request, 'reporter-hub.html', context)
