@@ -3,216 +3,239 @@
 {% block content %}
 
 
-        <div class="content-wrapper">
-            <div class="container-xxl flex-grow-1 container-p-y">
-            <h4 class="fw-semibold py-3 mb-4"><span class="text-muted fw-light">Welcome To /</span>Dashboard</h4>
-        <div class="col-lg-12 col-md-12">
-          <div class="row">
-              <!-- First 4-col div -->
-              <div class="col-lg-4 col-md-3 col-12 mb-4">
-                  <div class="card">
-                      <div class="card-body">
-                          <span class="fw-semibold d-block mb-1">Total Incidence Reports</span>
-                          <h3 class="card-title mb-2">{{stations}}</h3>
-                          <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
-                      </div>
-                  </div>
-              </div>
-    
-              <div class="col-lg-4 col-md-3 col-12 mb-4">
-                  <div class="card">
-                      <div class="card-body">
-                          <span class="fw-semibold d-block mb-1">Total Reporters</span>
-                          <h3 class="card-title mb-2">{{campaigns}}</h3>
-                          <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
-                      </div>
-                  </div>
-              </div>
-    
-              
-              <div class="col-lg-4 col-md-3 col-12 mb-4">
-                  <div class="card">
-                      <div class="card-body">
-                          <span class="fw-semibold d-block mb-1">Total Knowledge Contents</span>
-                          <h3 class="card-title mb-2">{{pat_count}}</h3>
-                          <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
-                      </div>
-                  </div>
-              </div>
-    
+<div class="content-wrapper">
+  <div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-semibold py-3 mb-4"><span class="text-muted fw-light">Welcome To /</span>Dashboard</h4>
+    <div class="col-lg-12 col-md-12">
+      <div class="row">
+        <!-- First 4-col div -->
+        <div class="col-lg-4 col-md-3 col-12 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <span class="fw-semibold d-block mb-1">Total Incidence Reports</span>
+              <h3 class="card-title mb-2">{{total_report}}</h3>
+              <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
+            </div>
           </div>
-</div>    
-<!-- Content -->
-<div class="row">
-    <div class="col-md-12">
-      <ul class="nav nav-pills flex-column flex-md-row mb-3">
-        <li class="nav-item">
-          <a class="nav-link active" href="javascript:void(0);"><i class="bx bxl-telegram me-1"></i>
-            Dashboard</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'admin-users' %}"><i class='bx bxs-user-detail'></i>Users</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'admin-reports' %}"><i class="bx bxs-report"></i>Reports
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'admin-hub' %}"><i class="bx bxs-graduation"></i>
-            Knowledge</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'logout' %}"><i class="bx bx-log-out"></i>Logut
-          </a>
-        </li>
-      </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-3 col-12 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <span class="fw-semibold d-block mb-1">Total Reporters</span>
+              <h3 class="card-title mb-2">{{total_reporters}}</h3>
+              <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-lg-4 col-md-3 col-12 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <span class="fw-semibold d-block mb-1">Total Knowledge Contents</span>
+              <h3 class="card-title mb-2">{{total_content}}</h3>
+              <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>0</small>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
-  
-        <div class="col-lg-8 mb-4 order-0">
-          <div class="card">
-            <div class="d-flex align-items-end row">
-              <div>
-                <div class="card-body">
-                  <h5 class="card-title text-primary">Incidence Reporters Map</h5>
-                  <div id="mapid" style="height: 400px;"></div>
-                </div>
-              </div>
+    <!-- Content -->
+    <div class="row">
+      <div class="col-md-12">
+        <ul class="nav nav-pills flex-column flex-md-row mb-3">
+          <li class="nav-item">
+            <a class="nav-link active" href="javascript:void(0);"><i class="bx bxl-telegram me-1"></i>
+              Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin-users' %}"><i class='bx bxs-user-detail'></i>Users</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin-reports' %}"><i class="bx bxs-report"></i>Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin-hub' %}"><i class="bx bxs-graduation"></i>
+              Knowledge</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}"><i class="bx bx-log-out"></i>Logut
+            </a>
+          </li>
+        </ul>
+      </div>
 
-            </div>
-          </div>
-        </div>
- 
-        <div class="col-lg-4 col-md-4 order-1">
-          <div class="row">
-            <div class="col-lg-6 col-md-12 col-6 mb-4">
-              <div class="card">
-                <div class="card-body">
-                  <span class="fw-semibold d-block mb-1">Total Positive Reports</span>
-                  <h3 class="card-title mb-2"> {{ positive_male }} </h3>
-                  
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-6 col-md-12 col-6 mb-4">
-              <div class="card">
-                <div class="card-body">
+      <div class="col-lg-8 mb-4 order-0">
+        <div class="card">
+          <div class="d-flex align-items-end row">
+            <div>
+              <div class="card-body">
+                <h5 class="card-title text-primary">Incidence Reports</h5>
+                <div id="mapid">
+                  <div class="table-responsive text-nowrap">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th style="max-width: 300px;">Incidence</th>
+                          <th>Status</th>
+                          <th>Social Media/GeoCord</th>
+                        </tr>
+                      </thead>
+                      <tbody class="table-border-bottom-0">
+                        {% for r in page_obj %}
+                        <tr>
+                          <td style="max-width: 300px; word-wrap: break-word; white-space: normal;">
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm">{{ r.title }}</h6>
+                                <p class="text-xs text-secondary mb-0">
+                                  {{ r.content }}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
 
-                  <span class="fw-semibold d-block mb-1">Total Negative Reports</span>
-                  <h3 class="card-title text-nowrap mb-1"> {{positive_female}} </h3>
-                  
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-4">
-              <div class="card">
-                <div class="card-body">
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column justify-content-center">
+                                {% if r.status == '1' %}
+                                <h6 class="mb-0 text-sm">Positive Post</h6>
+                                {% else %}
+                                <h6 class="mb-0 text-sm">Negative Post</h6>
+                                {% endif %}
+                                <p class="text-xs text-secondary mb-0">{{ r.model }}</p>
+                                <p class="text-xs text-secondary mb-0">{{ r.percentage }}</p>
+                              </div>
+                            </div>
+                          </td>
 
-                  <span class="d-block mb-1">Reports by Social Media Type</span>
-                  <h3 class="card-title text-nowrap mb-4">
-                    
-                      <table class="table">
-                          <thead>
-                              <tr>
-                                  <th> <i class='bx bxl-facebook-square' ></i> </th>
-                                  <th><i class='bx bxl-instagram-alt' ></i></th>
-                                  <th><i class='bx bxl-twitter' ></i></th>
-                                  <th><i class='bx bxl-linkedin-square' ></i></th>
-                                  <th>Others</th>
-                                </tr>
-                          </thead>
-                          <tbody class="table-border-bottom-0">
-                              <tr>
-                                  <td> {{children_count}} </td>
-                                  <td> {{teenagers_count}} </td>
-                                  <td> {{young_adults_count}} </td>
-                                  <td> {{senior_adults_count}} </td>
-                                  <td> {{senior_adults_count}} </td>
-                          </tbody>
-                      </table>
-                  </h3>
-                </div>
-              </div>
-            </div>
-        
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column justify-content-center">
+                                <p class="text-xs text-secondary mb-0">{{ r.social_media }}</p>
+                                <p class="text-xs text-secondary mb-0">{{ r.gis_location }}</p>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
 
-            <div class="col-12 mb-4">
-              <div class="card">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
-                    <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
-                      <div class="card-title">
-                        <h5 class="text-nowrap mb-2">Yearly Incidence Profile</h5>
-                        <span class="badge bg-label-warning rounded-pill">Year 2024</span>
-                      </div>
-                      <div class="mt-sm-auto">
-                        <small class="text-success text-nowrap fw-semibold"><i class="bx bx-chevron-up"></i>0</small>
-                        <h3 class="mb-0">{{pos_cases}}</h3>
-                      </div>
-                    </div>
-                    <div id="profileReportChart"></div>
+                    <!-- Pagination controls -->
+                    <nav aria-label="Page navigation example">
+                      <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                          <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                          </a>
+                        </li>
+                        {% endif %}
+                        {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                          <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                          </a>
+                        </li>
+                        {% endif %}
+                      </ul>
+                    </nav>
+
                   </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-4 order-1">
+        <div class="row">
+          <div class="col-lg-6 col-md-12 col-6 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <span class="fw-semibold d-block mb-1">Total Positive Reports</span>
+                <h3 class="card-title mb-2"> {{ total_positive }} </h3>
+
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-12 col-6 mb-4">
+            <div class="card">
+              <div class="card-body">
+
+                <span class="fw-semibold d-block mb-1">Total Negative Reports</span>
+                <h3 class="card-title text-nowrap mb-1"> {{total_negative}} </h3>
+
+              </div>
+            </div>
+          </div>
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-body">
+
+                <span class="d-block mb-1">Reports by Social Media Type</span>
+                <h3 class="card-title text-nowrap mb-4">
+
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th> <i class='bx bxl-facebook-square'></i> </th>
+                        <th><i class='bx bxl-instagram-alt'></i></th>
+                        <th><i class='bx bxl-twitter'></i></th>
+                        <th><i class='bx bxl-linkedin-square'></i></th>
+                        <th>Others</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                      <tr>
+                        <td> {{total_fc}} </td>
+                        <td> {{total_tw}} </td>
+                        <td> {{total_in}} </td>
+                        <td> {{total_ln}} </td>
+                        <td> {{total_ot}} </td>
+                    </tbody>
+                  </table>
+                </h3>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
+                  <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
+                    <div class="card-title">
+                      <h5 class="text-nowrap mb-2">Yearly Incidence Profile</h5>
+                      <span class="badge bg-label-warning rounded-pill">Year 2024</span>
+                    </div>
+                    <div class="mt-sm-auto">
+                      <small class="text-success text-nowrap fw-semibold"><i class="bx bx-chevron-up"></i>0</small>
+                      <h3 class="mb-0">{{total_report}}</h3>
+                    </div>
+                  </div>
+                  <div id="profileReportChart"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- Total Revenue --
-        <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-          <div class="card">
-            <div class="row row-bordered g-0">
-              <div class="col-md-12">
-                <h5 class="card-header m-0 me-2 pb-3">Malaria Cases by Months</h5>
-                <div id="totalRevenueChart" class="px-2"></div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-         Total Revenue -->
       </div>
     </div>
   </div>
 </div>
-</div>
-<!--
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
-<script type="text/javascript">
-  var mymap = L.map('mapid').setView([12.4539, 7.4972], 13);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(mymap);
-
-  var redIcon = new L.Icon({
-    iconUrl: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2040%2040%22%3E%3Cpath%20d%3D%22M20%200%20C31%200%2040%209%2040%2020%20C40%2033%2020%2040%2020%2040%20C20%2040%200%2033%200%2020%20C0%209%209%200%2020%200%22%20fill%3D%22%23FF5733%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E',
-    iconSize: [10, 10],
-    iconAnchor: [5, 5],
-    popupAnchor: [0, -10]
-  });
-
-  var markers = JSON.parse('{{ markers_json|escapejs|safe }}');
-
-  for (var i = 0; i < markers.length; i++) {
-    var marker = L.marker(markers[i].location, { icon: redIcon }).addTo(mymap);
-    marker.bindPopup(markers[i].popup);
-  }
-
-  var blueIcon = new L.Icon({
-    iconUrl: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2040%2040%22%3E%3Cpath%20d%3D%22M20%200%20C31%200%2040%209%2040%2020%20C40%2033%2020%2040%2020%2040%20C20%2040%200%2033%200%2020%20C0%209%209%200%2020%200%22%20fill%3D%22%230000FF%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E',
-    iconSize: [10, 10],
-    iconAnchor: [5, 5],
-    popupAnchor: [0, -10]
-  });
-
-  var markers2 = JSON.parse('{{ markers_json2|escapejs|safe }}');
-
-  for (var i = 0; i < markers2.length; i++) {
-    var marker = L.marker(markers2[i].location, { icon: blueIcon }).addTo(mymap);
-    marker.bindPopup(markers2[i].popup);
-  }
-</script>
--->
-<!-- / Content -->
 {% endblock content %}
